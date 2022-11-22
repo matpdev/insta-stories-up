@@ -1,23 +1,23 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
-import GlobalContext from "./../context/Global";
-import StoriesContext from "./../context/Stories";
-import ProgressContext from "./../context/Progress";
-import Story from "./Story";
-import ProgressArray from "./ProgressArray";
+import React, { useContext, useState, useRef, useEffect } from 'react'
+import GlobalContext from './../context/Global'
+import StoriesContext from './../context/Stories'
+import ProgressContext from './../context/Progress'
+import Story from './Story'
+import ProgressArray from './ProgressArray'
 import {
   GlobalCtx,
   StoriesContext as StoriesContextInterface,
-} from "./../interfaces";
+} from './../interfaces'
 
 export default function () {
-  const [currentId, setCurrentId] = useState<number>(0);
-  const [pause, setPause] = useState<boolean>(true);
-  const [muted, setMuted] = useState<boolean>(true);
-  const [bufferAction, setBufferAction] = useState<boolean>(true);
-  const [videoDuration, setVideoDuration] = useState<number>(0);
+  const [currentId, setCurrentId] = useState<number>(0)
+  const [pause, setPause] = useState<boolean>(true)
+  // const [muted, setMuted] = useState<boolean>(true);
+  const [bufferAction, setBufferAction] = useState<boolean>(true)
+  const [videoDuration, setVideoDuration] = useState<number>(0)
 
-  let mousedownId = useRef<any>();
-  let isMounted = useRef<boolean>(true);
+  let mousedownId = useRef<any>()
+  let isMounted = useRef<boolean>(true)
 
   const {
     width,
@@ -28,112 +28,116 @@ export default function () {
     keyboardNavigation,
     preventDefault,
     storyContainerStyles = {},
-  } = useContext<GlobalCtx>(GlobalContext);
-  const { stories } = useContext<StoriesContextInterface>(StoriesContext);
+    isMuted,
+  } = useContext<GlobalCtx>(GlobalContext)
+  const { stories } = useContext<StoriesContextInterface>(StoriesContext)
+
+  console.log('Container', isMuted)
 
   useEffect(() => {
-    if (typeof currentIndex === "number") {
+    if (typeof currentIndex === 'number') {
       if (currentIndex >= 0 && currentIndex < stories.length) {
-        setCurrentIdWrapper(() => currentIndex);
+        setCurrentIdWrapper(() => currentIndex)
       } else {
         console.error(
-          "Index out of bounds. Current index was set to value more than the length of stories array.",
-          currentIndex
-        );
+          'Index out of bounds. Current index was set to value more than the length of stories array.',
+          currentIndex,
+        )
       }
     }
-  }, [currentIndex]);
+  }, [currentIndex])
 
   useEffect(() => {
-    if (typeof isPaused === "boolean") {
-      setPause(isPaused);
+    if (typeof isPaused === 'boolean') {
+      setPause(isPaused)
     }
-  }, [isPaused]);
+  }, [isPaused])
 
   useEffect(() => {
-    const isClient = typeof window !== "undefined" && window.document;
+    const isClient = typeof window !== 'undefined' && window.document
     if (
       isClient &&
-      typeof keyboardNavigation === "boolean" &&
+      typeof keyboardNavigation === 'boolean' &&
       keyboardNavigation
     ) {
-      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener('keydown', handleKeyDown)
       return () => {
-        document.removeEventListener("keydown", handleKeyDown);
-      };
+        document.removeEventListener('keydown', handleKeyDown)
+      }
     }
-  }, [keyboardNavigation]);
+  }, [keyboardNavigation])
 
   useEffect(() => {
     return () => {
-      isMounted.current = false;
-    };
-  }, []);
+      isMounted.current = false
+    }
+  }, [])
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "ArrowLeft") {
-      previous();
-    } else if (e.key === "ArrowRight") {
-      next();
+    if (e.key === 'ArrowLeft') {
+      previous()
+    } else if (e.key === 'ArrowRight') {
+      next()
     }
-  };
+  }
 
   const toggleState = (action: string, bufferAction?: boolean) => {
-    setPause(action === "pause");
-    setBufferAction(!!bufferAction);
-  };
+    setPause(action === 'pause')
+    setBufferAction(!!bufferAction)
+  }
 
   const setCurrentIdWrapper = (callback) => {
-    setCurrentId(callback);
-    toggleState("pause", true);
-  };
+    setCurrentId(callback)
+    toggleState('pause', true)
+  }
 
   const previous = () => {
-    setCurrentIdWrapper((prev) => (prev > 0 ? prev - 1 : prev));
-  };
+    setCurrentIdWrapper((prev) => (prev > 0 ? prev - 1 : prev))
+  }
 
   const next = () => {
     if (isMounted.current) {
       if (loop) {
-        updateNextStoryIdForLoop();
+        updateNextStoryIdForLoop()
       } else {
-        updateNextStoryId();
+        updateNextStoryId()
       }
     }
-  };
+  }
 
   const updateNextStoryIdForLoop = () => {
-    setCurrentIdWrapper((prev) => (prev + 1) % stories.length);
-  };
+    setCurrentIdWrapper((prev) => (prev + 1) % stories.length)
+  }
 
   const updateNextStoryId = () => {
     setCurrentIdWrapper((prev) => {
-      if (prev < stories.length - 1) return prev + 1;
-      return prev;
-    });
-  };
+      if (prev < stories.length - 1) return prev + 1
+      return prev
+    })
+  }
 
   const debouncePause = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     mousedownId.current = setTimeout(() => {
-      toggleState("pause");
-    }, 200);
-  };
+      toggleState('pause')
+    }, 200)
+  }
 
-  const mouseUp =
-    (type: string) => (e: React.MouseEvent | React.TouchEvent) => {
-      e.preventDefault();
-      mousedownId.current && clearTimeout(mousedownId.current);
-      if (pause) {
-        toggleState("play");
-      } else {
-        type === "next" ? next() : previous();
-      }
-    };
+  const mouseUp = (type: string) => (
+    e: React.MouseEvent | React.TouchEvent,
+  ) => {
+    e.preventDefault()
+    mousedownId.current && clearTimeout(mousedownId.current)
+    if (pause) {
+      toggleState('play')
+    } else {
+      type === 'next' ? next() : previous()
+    }
+  }
 
   const getVideoDuration = (duration: number) => {
-    setVideoDuration(duration * 1000);
-  };
+    setVideoDuration(duration * 1000)
+  }
 
   return (
     <div
@@ -160,27 +164,27 @@ export default function () {
         playState={pause}
         story={stories[currentId]}
         getVideoDuration={getVideoDuration}
-        isMuted={muted}
+        isMuted={isMuted}
       />
       {!preventDefault && (
         <>
           <div style={styles.overlay}>
             <div
-              style={{ width: "50%", zIndex: 999 }}
+              style={{ width: '50%', zIndex: 999 }}
               onTouchStart={debouncePause}
-              onTouchEnd={mouseUp("previous")}
+              onTouchEnd={mouseUp('previous')}
               onMouseDown={debouncePause}
-              onMouseUp={mouseUp("previous")}
+              onMouseUp={mouseUp('previous')}
             />
             <div
-              style={{ width: "50%", zIndex: 999 }}
+              style={{ width: '50%', zIndex: 999 }}
               onTouchStart={debouncePause}
-              onTouchEnd={mouseUp("next")}
+              onTouchEnd={mouseUp('next')}
               onMouseDown={debouncePause}
-              onMouseUp={mouseUp("next")}
+              onMouseUp={mouseUp('next')}
             />
           </div>
-          {stories[currentId].type == "video" && (
+          {/* {stories[currentId].type == "video" && (
             <div style={styles.overlay2}>
               <div
                 style={{
@@ -233,29 +237,29 @@ export default function () {
                 )}
               </div>
             </div>
-          )}
+          )} */}
         </>
       )}
     </div>
-  );
+  )
 }
 
 const styles = {
   container: {
-    display: "flex",
-    flexDirection: "column",
-    background: "#111",
-    position: "relative",
+    display: 'flex',
+    flexDirection: 'column',
+    background: '#111',
+    position: 'relative',
   },
   overlay: {
-    position: "absolute",
-    height: "inherit",
-    width: "inherit",
-    display: "flex",
+    position: 'absolute',
+    height: 'inherit',
+    width: 'inherit',
+    display: 'flex',
   },
   overlay2: {
-    position: "absolute",
-    height: "100%",
-    width: "100%",
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
   },
-};
+}

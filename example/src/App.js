@@ -3,10 +3,12 @@ import "./App.css";
 import Stories, { WithSeeMore } from "../../dist";
 
 function App() {
+  const [state, setState] = React.useState(true);
   return (
     <div className="App">
       <div className="stories">
-        <Stories loop keyboardNavigation stories={stories2} />
+        <button onClick={() => setState(!state)}></button>
+        <Stories loop keyboardNavigation stories={stories2} isMuted={state} />
       </div>
     </div>
   );
@@ -48,7 +50,8 @@ const Story3 = ({ action, isPaused }) => {
 
 const stories2 = [
   {
-    url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    url:
+      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     type: "video",
   },
   { content: Story2 },
