@@ -17,14 +17,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mohitk05/react-insta-stories.git"
+    "url": "git+https://github.com/matpdev/insta-stories-up"
   },
   "keywords": [
     "stories",
     "react",
     "instagram"
   ],
-  "author": "mohitk05",
+  "author": "mistergrow",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mohitk05/react-insta-stories/issues"
